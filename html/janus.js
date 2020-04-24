@@ -860,15 +860,34 @@ function Janus(gatewayCallbacks) {
 			}
 		}
 		if(websockets) {
-			ws = Janus.newWebSocket(server, 'janus-protocol');
+		    ws = Janus.newWebSocket(server, 'janus-protocol');
+		    var timeo=setTimeout(function(){
+			console.log("ALEX: GIVING UP ON WSS");
+			ws.alexclosing=true;
+			ws.close();
+			console.log("ALEX: SUCCESSFULLY CLOSED");
+			serversIndex++;
+			if (serversIndex == servers.length) {
+			    // We tried all the servers the user gave us and they all failed
+			    callbacks.error("Error connecting to any of the provided Janus servers: Is the server down? LAST=WSS-ALEX");
+			    return;
+			}
+			// Let's try the next server
+			server = null;
+			createSession(callbacks);
+			
+		    },1000);
+			
 			wsHandlers = {
-				'error': function() {
+			    'error': function() {
+				try{clearTimeout(timeo);} catch {};
+				if (ws.alexclosing) return;
 					Janus.error("Error connecting to the Janus WebSockets server... " + server);
 					if (Janus.isArray(servers) && !callbacks["reconnect"]) {
 						serversIndex++;
 						if (serversIndex === servers.length) {
 							// We tried all the servers the user gave us and they all failed
-							callbacks.error("Error connecting to any of the provided Janus servers: Is the server down?");
+							callbacks.error("Error connecting to any of the provided Janus servers: Is the server down? LAST=WSS-ERROR");
 							return;
 						}
 						// Let's try the next server
@@ -882,6 +901,7 @@ function Janus(gatewayCallbacks) {
 				},
 
 				'open': function() {
+				    try{clearTimeout(timeo);} catch {};
 					// We need to be notified about the success
 					transactions[transaction] = function(json) {
 						Janus.debug(json);
@@ -905,10 +925,12 @@ function Janus(gatewayCallbacks) {
 				},
 
 				'message': function(event) {
+				    try{clearTimeout(timeo);} catch {};
 					handleEvent(JSON.parse(event.data));
 				},
 
 				'close': function() {
+				    try{clearTimeout(timeo);} catch {};
 					if (!server || !connected) {
 						return;
 					}
@@ -952,7 +974,7 @@ function Janus(gatewayCallbacks) {
 					serversIndex++;
 					if(serversIndex === servers.length) {
 						// We tried all the servers the user gave us and they all failed
-						callbacks.error("Error connecting to any of the provided Janus servers: Is the server down?");
+						callbacks.error("Error connecting to any of the provided Janus servers: Is the server down? / LAST=REST");
 						return;
 					}
 					// Let's try the next server
