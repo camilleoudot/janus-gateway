@@ -2477,6 +2477,7 @@ function Janus(gatewayCallbacks) {
 				callbacks.error("No PeerConnection: if this is an answer, use createAnswer and not handleRemoteJsep");
 				return;
 			}
+			if (Janus.mungeSdpForBitrate) jsep.sdp = Janus.mungeSdpForBitrate(jsep.sdp);
 			config.pc.setRemoteDescription(jsep)
 				.then(function() {
 					Janus.log("Remote description accepted!");
