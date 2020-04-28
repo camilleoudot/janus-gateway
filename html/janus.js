@@ -592,8 +592,8 @@ function Janus(gatewayCallbacks) {
 			return;
 		} else if(json["janus"] === "ack") {
 			// Just an ack, we can probably ignore
-			Janus.debug("Got an ack on session " + sessionId);
-			Janus.debug(json);
+			//Janus.debug("Got an ack on session " + sessionId);
+			//Janus.debug(json);
 			var transaction = json["transaction"];
 			if(transaction) {
 				var reportSuccess = transactions[transaction];
