@@ -5,7 +5,7 @@
   "main": "html/janus.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/meetecho/janus-gateway.git"
+    "url": "git+https://github.com/camilleoudot/janus-gateway.git"
   },
   "author": "Lorenzo Miniero <lorenzo@meetecho.com> (http://www.meetecho.com/)",
   "license": "GPL-3.0",
