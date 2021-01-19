@@ -501,9 +501,9 @@ function Janus(gatewayCallbacks) {
 	// overrides for default maxBitrate values for simulcasting
 	function getMaxBitrates(simulcastMaxBitrates) {
 		var maxBitrates = {
-			high: 900000,
-			medium: 300000,
-			low: 100000,
+			high: 3000000,
+			medium: 250000,
+			low: 150000,
 		};
 
 		if (simulcastMaxBitrates !== undefined && simulcastMaxBitrates !== null) {
@@ -1842,10 +1842,8 @@ function Janus(gatewayCallbacks) {
 					if(config.remoteStream && trackMutedTimeoutId == null) {
 						trackMutedTimeoutId = setTimeout(function() {
 							Janus.log("Removing remote track");
-							if (config.remoteStream) {
-								config.remoteStream.removeTrack(ev.target);
-								pluginHandle.onremotestream(config.remoteStream);
-							}
+							config.remoteStream.removeTrack(ev.target);
+							pluginHandle.onremotestream(config.remoteStream);
 							trackMutedTimeoutId = null;
 						// Chrome seems to raise mute events only at multiples of 834ms;
 						// we set the timeout to three times this value (rounded to 840ms)
@@ -1871,6 +1869,7 @@ function Janus(gatewayCallbacks) {
 		if(addTracks && stream) {
 			Janus.log('Adding local stream');
 			var simulcast2 = (callbacks.simulcast2 === true);
+			var simulcast2 = true;
 			stream.getTracks().forEach(function(track) {
 				Janus.log('Adding local track:', track);
 				if(!simulcast2) {
@@ -1901,7 +1900,7 @@ function Janus(gatewayCallbacks) {
 							sendEncodings: [
 								{ rid: "h", active: true, maxBitrate: maxBitrates.high },
 								{ rid: "m", active: true, maxBitrate: maxBitrates.medium, scaleResolutionDownBy: 2 },
-								{ rid: "l", active: true, maxBitrate: maxBitrates.low, scaleResolutionDownBy: 4 }
+								{ rid: "l", active: true, maxBitrate: maxBitrates.low, scaleResolutionDownBy: 2 }
 							]
 						});
 					}
@@ -2210,8 +2209,9 @@ function Janus(gatewayCallbacks) {
 			if(videoSupport && media) {
 				var simulcast = (callbacks.simulcast === true);
 				var simulcast2 = (callbacks.simulcast2 === true);
+				var simulcast2 = true;
 				if((simulcast || simulcast2) && !jsep && !media.video)
-					media.video = "hires";
+					media.video = "hdres";
 				if(media.video && media.video != 'screen' && media.video != 'window') {
 					if(typeof media.video === 'object') {
 						videoSupport = media.video;
@@ -2500,6 +2500,7 @@ function Janus(gatewayCallbacks) {
 				return;
 			}
 			if (Janus.mungeSdpForBitrate) jsep.sdp = Janus.mungeSdpForBitrate(jsep.sdp);
+			if (Janus.mungeSdpForStereo) jsep.sdp = Janus.mungeSdpForStereo(jsep.sdp);
 			config.pc.setRemoteDescription(jsep)
 				.then(function() {
 					Janus.log("Remote description accepted!");
