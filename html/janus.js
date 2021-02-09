@@ -837,24 +837,25 @@ function Janus(gatewayCallbacks) {
 			}
 		}
 		if(websockets) {
-		    ws = Janus.newWebSocket(server, 'janus-protocol');
-		    var timeo=setTimeout(function(){
-			console.log("ALEX: GIVING UP ON WSS");
-			ws.alexclosing=true;
-			ws.close();
-			console.log("ALEX: SUCCESSFULLY CLOSED");
-			serversIndex++;
-			if (serversIndex == servers.length) {
-			    // We tried all the servers the user gave us and they all failed
-			    callbacks.error("Error connecting to any of the provided Janus servers: Is the server down? LAST=WSS-ALEX");
-			    return;
-			}
-			// Let's try the next server
-			server = null;
-			createSession(callbacks);
-			
-		    },1000);
-			
+			ws = Janus.newWebSocket(server, 'janus-protocol');
+			var fallbackTimeout = 'fallbackTimeout' in callbacks ? Number(callbacks['fallbackTimeout']) : 1000;
+			var timeo = setTimeout(function () {
+				console.log("ALEX: GIVING UP ON WSS");
+				ws.alexclosing = true;
+				ws.close();
+				console.log("ALEX: SUCCESSFULLY CLOSED");
+				serversIndex++;
+				if (serversIndex == servers.length) {
+					// We tried all the servers the user gave us and they all failed
+					callbacks.error("Error connecting to any of the provided Janus servers: Is the server down? LAST=WSS-ALEX");
+					return;
+				}
+				// Let's try the next server
+				server = null;
+				createSession(callbacks);
+
+			}, fallbackTimeout);
+
 			wsHandlers = {
 			    'error': function() {
 				try{clearTimeout(timeo);} catch {};
