@@ -1870,7 +1870,6 @@ function Janus(gatewayCallbacks) {
 		if(addTracks && stream) {
 			Janus.log('Adding local stream');
 			var simulcast2 = (callbacks.simulcast2 === true);
-			var simulcast2 = true;
 			stream.getTracks().forEach(function(track) {
 				Janus.log('Adding local track:', track);
 				if(!simulcast2) {
@@ -2210,7 +2209,6 @@ function Janus(gatewayCallbacks) {
 			if(videoSupport && media) {
 				var simulcast = (callbacks.simulcast === true);
 				var simulcast2 = (callbacks.simulcast2 === true);
-				var simulcast2 = true;
 				if((simulcast || simulcast2) && !jsep && !media.video)
 					media.video = "hdres";
 				if(media.video && media.video != 'screen' && media.video != 'window') {
